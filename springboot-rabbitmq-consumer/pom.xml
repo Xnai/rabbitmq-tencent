@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.local</groupId>
-    <artifactId>springboot-rabbitmq-producer</artifactId>
+    <artifactId>springboot-rabbitmq-consumer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-rabbitmq-producer</name>
+    <name>springboot-rabbitmq-consumer</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -31,11 +31,6 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <exclusions>
@@ -44,11 +39,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

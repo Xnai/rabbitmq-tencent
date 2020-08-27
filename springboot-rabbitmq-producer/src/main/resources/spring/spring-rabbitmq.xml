@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+        http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!-- 该配置在单元测试中实验进行 -->
+    <!-- 定义过期队列及属性，若队列不存在，则自动创建 -->
+    <rabbit:queue id="my_ttl_queue" name="my_ttl_queue" auto-declare="true">
+        <rabbit:queue-arguments>
+            <!-- 该队列的消息在6秒之后没有消费者消费时，则本条消息自动删除 -->
+            <entry key="x-message-ttl" value-type="long" value="6000"></entry>
+            <!--
+                参数 x-message-ttl 的值必须为非负的32位整数（0<n<2^32-1)，以毫秒为单位表示TTL的值。
+                如果不设置ttl，则表示消息不会过期。如果将ttl设置为0，则表示，除非此时将消息消费，否则消息将被立即丢弃
+            -->
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+</beans>
