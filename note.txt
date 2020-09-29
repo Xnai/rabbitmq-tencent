@@ -43,3 +43,29 @@ RabbitMQ 高级
     （两者不可同时使用）在 channel 为事务时，不可引入确认模式；同样 channel为确认模式时，不可使用事务。
      ①消息确认
      有两种方式，消息发送成功确认 & 消息发送失败回调。
+     ②事务支持
+     场景：业务处理伴随消息的发送，业务处理失败（事务回滚）后要求消息不发送。
+     rabbitmq 使用调用者的外部事务，通常是是首选，因为它是非入侵性的（低耦合）。
+
+5. 消息追踪
+    消息中心的消息追踪需要使用 Trace 实现， Trace 是 RabbitMQ 用于记录每一次发送的消息，方便使用 RabbitMQ 的开发者调试、排错。
+    可以通过插件的形式提供可视化界面。
+    Trace 启动后会自动创建系统 Exchange: amq.rabbitmq.trace，类型为 topic，每个队列会自动绑定该 Exchange，绑定后发送到队列的消息都会记录到 Trace 日志。
+
+    常用命令：
+    注：需要先 rabbitmq 启用插件，再打开开关才能使用
+    rabbitmq-plugins list                                   查看插件列表
+    rabbitmq-plugins enable rabbitmq_tracing                rabbitmq 启用 trace 插件
+    rabbitmqctl trace_on                                    打开 trace 的开关
+    rabbitmqctl trace_on -p xxxx                            打开 trace 的开关，（xxxx）是指定需要日志追踪的 virtual-host 的名字
+    rabbitmqctl trace_off                                   关闭 trace 的开关
+    rabbitmq-plugins disable rabbitmq_tracing               rabbitmq 关闭 trace 插件
+    rabbitmqctl set_user_tags USERNAME administrator        只有 administrator 的角色才能查看日志界面
+
+    日志追踪查看操作：
+    ①在 admin 页签中，会多出来一个 Tracing 选项，在改页面添加一个新的 trace，指定 Virtual-host、Name
+    ②发送消息
+    ③点击 trace 的 Trace log file 的 Name，输入用户名、密码查看日志追踪信息
+    ④日志文件内容会累计增加，发送一条消息就追加一条消息的记录，手动刷新页面即可查看
+
+    可以查看Node（节点）、Connection（连接）、Virtual host（虚拟主机）、User（用户）、Channel（频道）、Exchange（交换机）、Routingkeys（绑定键）、Properties（参数属性）、Payload（消息内容）。

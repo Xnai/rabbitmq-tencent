@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -82,6 +83,22 @@ public class ProducerTest {
     public void test6() {
         // exchange 正确， queue 错误， confirm 被回调， ack=true: return 被回调 replyText="NO_ROUTE"
         rabbitTemplate.convertAndSend("test_fail_exchange", "", "测试消息发送失败进行确认应答");
+    }
+
+    /**
+     * 消息确认机制 事务支持，如果执行失败，则所有的消息均不发送
+     */
+    @Test
+    @Transactional // 开启事务
+    //@Rollback(false) // Spring 默认的 @Test 的方法就算执行成功也会将执行结果rollback，加上此注解，强制不自动回滚
+    // 如果方法要手动抛出异常时，需要将该 @Rollback 注解注释，不然 @Transactional 注解将没有意义
+    public void test7() {
+        // 路由键与队列同名
+        rabbitTemplate.convertAndSend("spring_queue", "只发队列 spring_queue 的消息---01");
+        System.out.println("业务需要处理的其他操作：......");
+        // 模拟业务处理失败，抛出异常
+        System.out.println(1/0);
+        rabbitTemplate.convertAndSend("spring_queue", "只发队列 spring_queue 的消息----02");
     }
 
 }
