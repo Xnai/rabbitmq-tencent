@@ -59,4 +59,29 @@ public class ProducerTest {
             rabbitTemplate.convertAndSend("my_normal_exchange", "my_max_dlx", message);
         }
     }
+
+    /**
+     * 消息确认测试，该确认由服务端返回，而不是接收端，调用 MsgSendConfirmCallback
+     *
+     */
+    @Test
+    public void test5() {
+        // 路由键与队列同名
+        rabbitTemplate.convertAndSend("spring_queue", "只发队列 spring_queue 的消息");
+    }
+
+    /**
+     * 消息确认失败回调，由服务端返回，调用MsgSendReturnCallback
+     * 刚开始，没有交换机叫 test_fail_exchange， 会打印：
+     *      消息确认失败，channel error; protocol method: #method<channel.close>(reply-code=404, reply-text=NOT_FOUND - no exchange 'test_fail_exchange' in vhost '/', class-id=60, method-id=40)
+     * 如果创建该交换机，则会打印：
+     *      Returned Message: 测试消息发送失败进行确认应答
+     *      消息确认成功...
+     */
+    @Test
+    public void test6() {
+        // exchange 正确， queue 错误， confirm 被回调， ack=true: return 被回调 replyText="NO_ROUTE"
+        rabbitTemplate.convertAndSend("test_fail_exchange", "", "测试消息发送失败进行确认应答");
+    }
+
 }

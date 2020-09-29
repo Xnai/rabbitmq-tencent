@@ -18,6 +18,8 @@
         </rabbit:queue-arguments>
     </rabbit:queue>
 
+
+    <!-- 死信队列 -->
     <!-- 定义定向交换机的持久化的死信队列，不存在则自动创建 -->
     <rabbit:queue id="my_dlx_queue" name="my_dlx_queue" auto-declare="true"></rabbit:queue>
 
@@ -57,4 +59,32 @@
             <rabbit:binding key="my_max_dlx" queue="my_max_dlx_queue"></rabbit:binding>
         </rabbit:bindings>
     </rabbit:direct-exchange>
+
+
+    <!-- 消息确认机制 -->
+    <!-- 消息确认   使用 publisher-confirms="true" 启用消息确认  -->
+    <!--                publisher-returns="true" 启用回调-->
+    <rabbit:connection-factory id="connectionFactory" host="${spring.rabbitmq.host}"
+                               port="${spring.rabbitmq.port}"
+                               username="${spring.rabbitmq.username}"
+                               password="${spring.rabbitmq.password}"
+                               publisher-confirms="true"
+                               publisher-returns="true"
+    ></rabbit:connection-factory>
+
+    <!-- 消息回调处理类 -->
+    <bean id="confirmCallback" class="com.local.springbootrabbitmqproducer.MsgSendConfirmCallback"></bean>
+    <!-- 消息失败回调类 -->
+    <bean id="sendReturnCallback" class="com.local.springbootrabbitmqproducer.MsgSendReturnCallback"></bean>
+
+    <!-- return-callback="sendReturnCallback" 表示：消息失败回调，同时需配置 mandatory="true" ，否则消息会丢失 -->
+    <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"
+                     confirm-callback="confirmCallback" return-callback="sendReturnCallback"
+                     mandatory="true"></rabbit:template>
+
+    <!-- 定义 rabbitmqTemplate 对象操作可以在代码中方便 发送消息 -->
+    <!--  confirm-callback="confirmCallback" 表示消息失败回调-->
+   <!-- <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"
+    confirm-callback="confirmCallback"></rabbit:template>-->
+
 </beans>
